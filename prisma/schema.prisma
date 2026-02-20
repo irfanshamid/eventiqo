@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String?  @unique
+  password     String
+  name         String?
+  phoneNumber  String?
+  gender       String?
+  role         String   @default("USER") // ADMIN, MANAGER, STAFF
+  isFirstLogin Boolean  @default(true)
+  isBanned     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  tasks        Task[]
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  name        String
+  clientName  String?
+  location    String?
+  date        DateTime?
+  status      String   @default("DRAFT") // DRAFT, ACTIVE, COMPLETED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Budget
+  totalBudget Float    @default(0)
+  targetMargin Float   @default(20) // Percentage
+  totalCost   Float    @default(0) // Calculated
+  profit      Float    @default(0) // Calculated
+  
+  tasks       Task[]
+  vendors     EventVendor[]
+  expenses    Expense[]
+  proposals   Proposal[]
+  contracts   Contract[]
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH
+  dueDate     DateTime?
+  
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id])
+  
+  assigneeId  String?
+  assignee    User?    @relation(fields: [assigneeId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Vendor {
+  id          String   @id @default(cuid())
+  name        String
+  category    String
+  contactInfo String?
+  averageCost Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  events      EventVendor[]
+  expenses    Expense[]
+}
+
+model EventVendor {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id])
+  vendorId  String
+  vendor    Vendor   @relation(fields: [vendorId], references: [id])
+  
+  role      String?
+  agreedCost Float?
+  status    String   @default("PENDING") // PENDING, PAID, PARTIAL
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  description     String
+  estimatedAmount Float    @default(0)
+  actualAmount    Float    @default(0)
+  category        String // Venue, Catering, Decoration, Talent, Production, FeeEO
+  date        DateTime
+  status      String   @default("UNPAID") // UNPAID, PAID
+  
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id])
+  
+  vendorId    String?
+  vendor      Vendor?  @relation(fields: [vendorId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Proposal {
+  id          String   @id @default(cuid())
+  title       String
+  content     Json?    // Store items as JSON or separate model
+  totalAmount Float
+  status      String   @default("DRAFT") // DRAFT, SENT, ACCEPTED, REJECTED
+  
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Contract {
+  id          String   @id @default(cuid())
+  title       String
+  content     Json?
+  status      String   @default("DRAFT") // DRAFT, SENT, SIGNED
+  
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SOP {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  content     String?  // Markdown or link to file
+  fileUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Template {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  content     String?
+  fileUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
