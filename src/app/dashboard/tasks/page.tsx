@@ -1,7 +1,7 @@
+import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { TaskList } from '@/components/tasks/task-list';
-import { redirect } from 'next/navigation';
 
 export default async function TasksPage() {
   const session = await getSession();
@@ -34,10 +34,7 @@ export default async function TasksPage() {
 
   const users = await prisma.user.findMany({
     where: {
-      OR: [
-        { id: ownerId },
-        { managerId: ownerId },
-      ],
+      OR: [{ id: ownerId }, { managerId: ownerId }],
     },
     select: { id: true, name: true },
   });

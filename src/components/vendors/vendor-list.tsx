@@ -30,8 +30,8 @@ interface Vendor {
   category: string;
   contactInfo: string | null;
   averageCost: number | null;
-  events: any[];
-  expenses: any[];
+  events: { id: string }[];
+  expenses: { id: string }[];
 }
 
 export function VendorList({ vendors }: { vendors: Vendor[] }) {
@@ -149,15 +149,19 @@ export function VendorList({ vendors }: { vendors: Vendor[] }) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <VendorDialog 
-                          vendor={vendor} 
+                        <VendorDialog
+                          vendor={vendor}
                           trigger={
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                              <Edit className="mr-2 h-4 w-4 text-green-600" /> Edit
+                            <DropdownMenuItem
+                              onSelect={(e) => e.preventDefault()}
+                              className="cursor-pointer"
+                            >
+                              <Edit className="mr-2 h-4 w-4 text-green-600" />{' '}
+                              Edit
                             </DropdownMenuItem>
                           }
                         />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => {
                             setSelectedVendor(vendor);
                             setConfirmOpen(true);
