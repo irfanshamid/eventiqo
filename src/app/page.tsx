@@ -410,7 +410,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="flex flex-col items-center md:items-end gap-4">
+          {/* <div className="flex flex-col items-center md:items-end gap-4">
             <div className="flex items-center gap-6">
               <a
                 href="https://instagram.com/mudakayaraya.id"
@@ -440,7 +440,7 @@ export default function LandingPage() {
                 info.indonesiapintar@gmail.com
               </span>
             </a>
-          </div>
+          </div> */}
         </div>
       </footer>
     </div>
