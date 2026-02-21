@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -10,18 +10,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus } from "lucide-react";
-import { addEventVendor, updateEventVendor } from "@/app/actions/event-vendors";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Plus } from 'lucide-react';
+import { addEventVendor, updateEventVendor } from '@/app/actions/event-vendors';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 interface Vendor {
   id: string;
@@ -42,7 +42,11 @@ interface EventVendorDialogProps {
   vendors: Vendor[];
 }
 
-export function EventVendorDialog({ eventId, eventVendor, vendors }: EventVendorDialogProps) {
+export function EventVendorDialog({
+  eventId,
+  eventVendor,
+  vendors,
+}: EventVendorDialogProps) {
   const [open, setOpen] = useState(false);
   const isEditing = !!eventVendor;
 
@@ -59,7 +63,7 @@ export function EventVendorDialog({ eventId, eventVendor, vendors }: EventVendor
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {isEditing ? (
-          <Button variant="ghost" size="sm">
+          <Button variant="secondary" size="sm">
             Edit
           </Button>
         ) : (
@@ -71,19 +75,19 @@ export function EventVendorDialog({ eventId, eventVendor, vendors }: EventVendor
       <DialogContent className="sm:max-w-[425px]">
         <form action={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Edit Vendor" : "Add Vendor to Event"}</DialogTitle>
+            <DialogTitle>
+              {isEditing ? 'Edit Vendor' : 'Add Vendor to Event'}
+            </DialogTitle>
             <DialogDescription>
               {isEditing
-                ? "Update vendor details for this event."
-                : "Select a vendor and assign a role."}
+                ? 'Update vendor details for this event.'
+                : 'Select a vendor and assign a role.'}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             {!isEditing && (
               <div className="flex flex-col gap-2">
-                <Label htmlFor="vendorId">
-                  Vendor
-                </Label>
+                <Label htmlFor="vendorId">Vendor</Label>
                 <div>
                   <Select name="vendorId" required>
                     <SelectTrigger className="w-full">
@@ -101,21 +105,17 @@ export function EventVendorDialog({ eventId, eventVendor, vendors }: EventVendor
               </div>
             )}
             <div className="flex flex-col gap-2">
-              <Label htmlFor="role">
-                Role
-              </Label>
+              <Label htmlFor="role">Role</Label>
               <Input
                 id="role"
                 name="role"
-                defaultValue={eventVendor?.role || ""}
+                defaultValue={eventVendor?.role || ''}
                 placeholder="e.g. Main Photographer"
                 required
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="agreedCost">
-                Agreed Cost
-              </Label>
+              <Label htmlFor="agreedCost">Agreed Cost</Label>
               <Input
                 id="agreedCost"
                 name="agreedCost"
@@ -125,11 +125,12 @@ export function EventVendorDialog({ eventId, eventVendor, vendors }: EventVendor
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="status">
-                Payment Status
-              </Label>
+              <Label htmlFor="status">Payment Status</Label>
               <div>
-                <Select name="status" defaultValue={eventVendor?.status || "PENDING"}>
+                <Select
+                  name="status"
+                  defaultValue={eventVendor?.status || 'PENDING'}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
@@ -143,7 +144,9 @@ export function EventVendorDialog({ eventId, eventVendor, vendors }: EventVendor
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">{isEditing ? "Save changes" : "Add Vendor"}</Button>
+            <Button type="submit">
+              {isEditing ? 'Save changes' : 'Add Vendor'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

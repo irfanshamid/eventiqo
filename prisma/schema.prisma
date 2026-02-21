@@ -22,6 +22,12 @@ model User {
   updatedAt    DateTime @updatedAt
   
   tasks        Task[]
+  events       Event[]
+  
+  // Team Management
+  managerId    String?
+  manager      User?    @relation("UserStaff", fields: [managerId], references: [id])
+  staff        User[]   @relation("UserStaff")
 }
 
 model Event {
@@ -34,6 +40,9 @@ model Event {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
+  createdById String?
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+
   // Budget
   totalBudget Float    @default(0)
   targetMargin Float   @default(20) // Percentage
@@ -73,6 +82,8 @@ model Vendor {
   averageCost Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  createdById String?
   
   events      EventVendor[]
   expenses    Expense[]

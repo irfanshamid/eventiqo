@@ -77,8 +77,8 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col bg-[#1F2937] text-white">
-      <div className="flex h-16 items-center px-6 border-b border-gray-700">
+    <div className="flex h-full flex-col bg-[#F1F5F9] text-slate-700 border-r border-slate-200">
+      <div className="flex h-16 items-center px-6 border-b border-slate-200">
         <div className="relative h-10 w-32">
           <Image
             src="/logo.png"
@@ -96,10 +96,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-700 hover:text-white',
+                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-slate-200 hover:text-slate-900',
                 pathname === item.href || pathname?.startsWith(item.href + '/')
-                  ? 'bg-[#1E88E5] text-white'
-                  : 'text-gray-300',
+                  ? 'bg-[#1E88E5] text-white hover:bg-[#1565C0] hover:text-white'
+                  : 'text-slate-600',
               )}
             >
               <item.icon className="h-5 w-5" />

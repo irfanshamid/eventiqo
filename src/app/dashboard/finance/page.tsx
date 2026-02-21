@@ -11,9 +11,20 @@ import {
 import { DollarSign, TrendingUp, TrendingDown, PieChart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { FinanceChart } from '@/components/finance/finance-chart';
+import { getSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 export default async function FinancePage() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  if (!user) redirect('/api/auth/logout');
+
+  const ownerId = user.managerId || user.id;
+
   const events = await prisma.event.findMany({
+    where: { createdById: ownerId },
     include: {
       expenses: true,
     },

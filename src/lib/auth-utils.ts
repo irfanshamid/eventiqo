@@ -1,5 +1,4 @@
 import { compare, hash } from 'bcryptjs';
-import { randomBytes } from 'crypto';
 
 export async function hashPassword(password: string): Promise<string> {
   return await hash(password, 12);
@@ -12,10 +11,14 @@ export async function comparePassword(password: string, hash: string): Promise<b
 export function generatePassword(length = 10): string {
   const charset = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let password = "";
-  const randomValues = randomBytes(length);
+  // Use simple Math.random for client-side compatibility if needed, 
+  // but for server-side actions randomBytes is fine. 
+  // However, randomBytes returns Buffer which acts like array of uint8.
+  // The original implementation using randomBytes[i] % charset.length is correct logic
+  // but might be simpler to just use Math.random() to avoid Node/Edge runtime issues if any.
   
   for (let i = 0; i < length; i++) {
-    password += charset[randomValues[i] % charset.length];
+    password += charset.charAt(Math.floor(Math.random() * charset.length));
   }
   
   return password;

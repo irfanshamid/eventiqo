@@ -11,21 +11,58 @@ import {
 import { Button } from "@/components/ui/button";
 import { FileText, Download } from "lucide-react";
 
+interface EventData {
+  name: string;
+  clientName: string;
+  date: string;
+  location: string;
+  totalBudget: string;
+}
+
 interface Template {
   id: string;
   title: string;
   category: string;
+  content: string | null;
 }
 
 interface EventDocumentListProps {
   templates: Template[];
+  event: EventData;
 }
 
-export function EventDocumentList({ templates }: EventDocumentListProps) {
-  // This is a placeholder for generating documents from templates
-  // In a real app, you would have a function to generate the PDF/Doc based on event data and template content
-  const handleDownload = (templateId: string) => {
-    alert(`Generating document for template ${templateId}... (Feature coming soon)`);
+export function EventDocumentList({ templates, event }: EventDocumentListProps) {
+  const handleDownload = (template: Template) => {
+    let content = template.content || "No content available.";
+    
+    // Replace placeholders
+    content = content.replace(/{{eventName}}/g, event.name);
+    content = content.replace(/{{clientName}}/g, event.clientName);
+    content = content.replace(/{{date}}/g, event.date);
+    content = content.replace(/{{location}}/g, event.location);
+    content = content.replace(/{{totalBudget}}/g, event.totalBudget);
+
+    const printWindow = window.open("", "_blank");
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${template.title}</title>
+            <style>
+              body { font-family: sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+              h1 { text-align: center; margin-bottom: 40px; }
+              .content { line-height: 1.6; }
+            </style>
+          </head>
+          <body>
+            <h1>${template.title}</h1>
+            <div class="content">${content}</div>
+            <script>window.onload = function() { window.print(); }</script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
   };
 
   return (
@@ -68,7 +105,7 @@ export function EventDocumentList({ templates }: EventDocumentListProps) {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => handleDownload(template.id)}
+                      onClick={() => handleDownload(template)}
                     >
                       <Download className="mr-2 h-4 w-4" /> Download
                     </Button>

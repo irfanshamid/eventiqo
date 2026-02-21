@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { createUser, resetPassword, toggleBanUser } from "@/app/actions/users";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { createUser, resetPassword, toggleBanUser } from '@/app/actions/users';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Dialog,
   DialogContent,
@@ -18,18 +18,18 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { 
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Ban, Key, UserPlus, CheckCircle } from "lucide-react";
+} from '@/components/ui/select';
+import { Ban, Key, UserPlus, CheckCircle } from 'lucide-react';
 
 interface User {
   id: string;
@@ -42,13 +42,19 @@ interface User {
 }
 
 export function UserList({ users }: { users: User[] }) {
-  const [passwordResult, setPasswordResult] = useState<{ username: string, password: string } | null>(null);
+  const [passwordResult, setPasswordResult] = useState<{
+    username: string;
+    password: string;
+  } | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   async function handleCreate(formData: FormData) {
     const res = await createUser(formData);
     if (res.success && res.password) {
-      setPasswordResult({ username: formData.get("username") as string, password: res.password });
+      setPasswordResult({
+        username: formData.get('username') as string,
+        password: res.password,
+      });
       setIsCreateOpen(false);
     } else {
       alert(res.error);
@@ -65,7 +71,7 @@ export function UserList({ users }: { users: User[] }) {
   }
 
   async function handleBan(user: User) {
-    if (confirm(`${user.isBanned ? "Unban" : "Ban"} ${user.username}?`)) {
+    if (confirm(`${user.isBanned ? 'Unban' : 'Ban'} ${user.username}?`)) {
       await toggleBanUser(user.id, !user.isBanned);
     }
   }
@@ -76,9 +82,17 @@ export function UserList({ users }: { users: User[] }) {
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
           <strong className="font-bold">Success! </strong>
           <span className="block sm:inline">
-            Credentials for {passwordResult.username}: <code className="bg-white px-2 py-1 rounded border">{passwordResult.password}</code>
+            Credentials for {passwordResult.username}:{' '}
+            <code className="bg-white px-2 py-1 rounded border">
+              {passwordResult.password}
+            </code>
           </span>
-          <Button variant="ghost" size="sm" className="absolute top-0 bottom-0 right-0 px-4 py-3" onClick={() => setPasswordResult(null)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute top-0 bottom-0 right-0 px-4 py-3"
+            onClick={() => setPasswordResult(null)}
+          >
             <span className="text-xl">&times;</span>
           </Button>
         </div>
@@ -113,7 +127,7 @@ export function UserList({ users }: { users: User[] }) {
                 <div className="grid gap-2">
                   <Label htmlFor="role">Role</Label>
                   <Select name="role" defaultValue="USER">
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -148,9 +162,11 @@ export function UserList({ users }: { users: User[] }) {
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name || "-"}</TableCell>
+                <TableCell className="font-medium">
+                  {user.name || '-'}
+                </TableCell>
                 <TableCell>{user.username}</TableCell>
-                <TableCell>{user.email || "-"}</TableCell>
+                <TableCell>{user.email || '-'}</TableCell>
                 <TableCell>
                   <Badge variant="outline">{user.role}</Badge>
                 </TableCell>
@@ -158,20 +174,34 @@ export function UserList({ users }: { users: User[] }) {
                   {user.isBanned ? (
                     <Badge variant="destructive">Banned</Badge>
                   ) : (
-                    <Badge variant="default" className="bg-green-500">Active</Badge>
+                    <Badge variant="default" className="bg-green-500">
+                      Active
+                    </Badge>
                   )}
-                  {user.isFirstLogin && <Badge variant="secondary" className="ml-2">New</Badge>}
+                  {user.isFirstLogin && (
+                    <Badge variant="secondary" className="ml-2">
+                      New
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell className="text-right space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => handleReset(user)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleReset(user)}
+                  >
                     <Key className="h-4 w-4" />
                   </Button>
-                  <Button 
-                    variant={user.isBanned ? "default" : "destructive"} 
-                    size="sm" 
+                  <Button
+                    variant={user.isBanned ? 'default' : 'destructive'}
+                    size="sm"
                     onClick={() => handleBan(user)}
                   >
-                    {user.isBanned ? <CheckCircle className="h-4 w-4" /> : <Ban className="h-4 w-4" />}
+                    {user.isBanned ? (
+                      <CheckCircle className="h-4 w-4" />
+                    ) : (
+                      <Ban className="h-4 w-4" />
+                    )}
                   </Button>
                 </TableCell>
               </TableRow>

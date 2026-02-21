@@ -28,15 +28,33 @@ interface Event {
   name: string;
   clientName: string | null;
   location: string | null;
-  date: Date | null;
+  date: Date | string | null;
   totalBudget: number;
   targetMargin: number;
   status: string;
 }
 
-export function EventDialog({ event }: { event?: Event }) {
-  const [open, setOpen] = useState(false);
+export function EventDialog({
+  event,
+  open: controlledOpen,
+  onOpenChange: setControlledOpen,
+}: {
+  event?: Event;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
   const isEditing = !!event;
+
+  const setOpen = (val: boolean) => {
+    if (isControlled && setControlledOpen) {
+      setControlledOpen(val);
+    } else {
+      setInternalOpen(val);
+    }
+  };
 
   async function handleSubmit(formData: FormData) {
     if (isEditing && event) {
@@ -49,18 +67,20 @@ export function EventDialog({ event }: { event?: Event }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {isEditing ? (
-          <Button variant="ghost" size="sm">
-            Edit
-          </Button>
-        ) : (
-          <Button className="bg-[#1E88E5] hover:bg-[#1565C0]">
-            <Plus className="mr-2 h-4 w-4" />
-            Buat Event Baru
-          </Button>
-        )}
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          {isEditing ? (
+            <Button variant="secondary" size="sm">
+              Edit
+            </Button>
+          ) : (
+            <Button className="bg-[#1E88E5] hover:bg-[#1565C0]">
+              <Plus className="mr-2 h-4 w-4" />
+              Buat Event Baru
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <form action={handleSubmit}>
           <DialogHeader>

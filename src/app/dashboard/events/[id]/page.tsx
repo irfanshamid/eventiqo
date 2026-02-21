@@ -5,8 +5,10 @@ import { BudgetPlanner } from '@/components/events/budget-planner';
 import { EventVendorList } from '@/components/events/vendors/event-vendor-list';
 import prisma from '@/lib/prisma';
 import { EventDialog } from '@/components/events/event-dialog';
-
 import { EventDocumentList } from '@/components/events/documents/event-document-list';
+import { TaskList } from '@/components/tasks/task-list';
+import { getSession } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 export default async function EventDetailPage({
   params,
@@ -14,6 +16,15 @@ export default async function EventDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  const currentUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  });
+  if (!currentUser) redirect('/api/auth/logout');
+
+  const ownerId = currentUser.managerId || currentUser.id;
 
   const event = await prisma.event.findUnique({
     where: { id },
@@ -31,15 +42,38 @@ export default async function EventDetailPage({
     return <div>Event not found</div>;
   }
 
+  const tasks = await prisma.task.findMany({
+    where: { eventId: id },
+    include: {
+      event: true,
+      assignee: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  const users = await prisma.user.findMany({
+    where: {
+      OR: [{ id: ownerId }, { managerId: ownerId }],
+    },
+    select: { id: true, name: true },
+  });
+
   const allVendors = await prisma.vendor.findMany({
     select: { id: true, name: true },
     orderBy: { name: 'asc' },
   });
 
   const templates = await prisma.template.findMany({
-    select: { id: true, title: true, category: true },
+    select: { id: true, title: true, category: true, content: true },
     orderBy: { title: 'asc' },
   });
+
+  const totalVendorCost = event.vendors.reduce(
+    (acc, v) => acc + (v.agreedCost || 0),
+    0,
+  );
 
   return (
     <div className="space-y-6">
@@ -82,7 +116,6 @@ export default async function EventDetailPage({
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {/* Quick stats for this event */}
             <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
               <div className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <h3 className="tracking-tight text-sm font-medium">
@@ -94,19 +127,23 @@ export default async function EventDetailPage({
                 {new Intl.NumberFormat('id-ID', {
                   style: 'currency',
                   currency: 'IDR',
+                  maximumFractionDigits: 0,
                 }).format(event.totalBudget)}
               </div>
-              <p className="text-xs text-muted-foreground">Target margin 20%</p>
+              <p className="text-xs text-muted-foreground">
+                Target margin {event.targetMargin}%
+              </p>
             </div>
-            {/* Add more cards */}
           </div>
         </TabsContent>
 
         <TabsContent value="tasks">
-          <div className="rounded-md border p-4 bg-white">
-            <h3 className="text-lg font-medium mb-4">Task Management</h3>
-            <p className="text-gray-500">Task list goes here...</p>
-          </div>
+          <TaskList
+            tasks={tasks}
+            events={[{ id: event.id, name: event.name }]}
+            users={users}
+            currentUserRole={currentUser.role}
+          />
         </TabsContent>
 
         <TabsContent value="budget">
@@ -119,6 +156,18 @@ export default async function EventDetailPage({
         </TabsContent>
 
         <TabsContent value="vendors">
+          <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-100 flex justify-between items-center">
+            <span className="text-sm font-medium text-blue-900">
+              Total Vendor Cost (Agreed)
+            </span>
+            <span className="text-xl font-bold text-blue-700">
+              {new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                maximumFractionDigits: 0,
+              }).format(totalVendorCost)}
+            </span>
+          </div>
           <EventVendorList
             eventId={event.id}
             eventVendors={event.vendors}
@@ -127,7 +176,19 @@ export default async function EventDetailPage({
         </TabsContent>
 
         <TabsContent value="documents">
-          <EventDocumentList templates={templates} />
+          <EventDocumentList
+            templates={templates}
+            event={{
+              name: event.name,
+              clientName: event.clientName || '',
+              date: event.date ? new Date(event.date).toLocaleDateString() : '',
+              location: event.location || '',
+              totalBudget: new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+              }).format(event.totalBudget),
+            }}
+          />
         </TabsContent>
       </Tabs>
     </div>

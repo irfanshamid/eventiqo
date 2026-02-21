@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -10,12 +10,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus } from "lucide-react";
-import { createVendor, updateVendor } from "@/app/actions/vendors";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Plus } from 'lucide-react';
+import { createVendor, updateVendor } from '@/app/actions/vendors';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface Vendor {
   id: string;
@@ -26,16 +32,22 @@ interface Vendor {
 }
 
 const CATEGORIES = [
-  "Venue",
-  "Catering",
-  "Decoration",
-  "Talent",
-  "Production",
-  "Documentation",
-  "Other"
+  'Venue',
+  'Catering',
+  'Decoration',
+  'Talent',
+  'Production',
+  'Documentation',
+  'Other',
 ];
 
-export function VendorDialog({ vendor }: { vendor?: Vendor }) {
+export function VendorDialog({
+  vendor,
+  trigger,
+}: {
+  vendor?: Vendor;
+  trigger?: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const isEditing = !!vendor;
 
@@ -51,8 +63,12 @@ export function VendorDialog({ vendor }: { vendor?: Vendor }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {isEditing ? (
-          <Button variant="ghost" size="sm">Edit</Button>
+        {trigger ? (
+          trigger
+        ) : isEditing ? (
+          <Button variant="ghost" size="sm">
+            Edit
+          </Button>
         ) : (
           <Button className="bg-[#1E88E5]">
             <Plus className="mr-2 h-4 w-4" /> Add Vendor
@@ -62,16 +78,18 @@ export function VendorDialog({ vendor }: { vendor?: Vendor }) {
       <DialogContent className="sm:max-w-[425px]">
         <form action={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Edit Vendor" : "Add Vendor"}</DialogTitle>
+            <DialogTitle>
+              {isEditing ? 'Edit Vendor' : 'Add Vendor'}
+            </DialogTitle>
             <DialogDescription>
-              {isEditing ? "Update vendor details." : "Add a new vendor to your list."}
+              {isEditing
+                ? 'Update vendor details.'
+                : 'Add a new vendor to your list.'}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="name">
-                Name
-              </Label>
+              <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
                 name="name"
@@ -80,12 +98,13 @@ export function VendorDialog({ vendor }: { vendor?: Vendor }) {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="category">
-                Category
-              </Label>
+              <Label htmlFor="category">Category</Label>
               <div>
-                <Select name="category" defaultValue={vendor?.category || CATEGORIES[0]}>
-                  <SelectTrigger>
+                <Select
+                  name="category"
+                  defaultValue={vendor?.category || CATEGORIES[0]}
+                >
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -99,29 +118,27 @@ export function VendorDialog({ vendor }: { vendor?: Vendor }) {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="contactInfo">
-                Contact
-              </Label>
+              <Label htmlFor="contactInfo">Contact</Label>
               <Input
                 id="contactInfo"
                 name="contactInfo"
-                defaultValue={vendor?.contactInfo || ""}
+                defaultValue={vendor?.contactInfo || ''}
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="averageCost">
-                Avg Cost
-              </Label>
+              <Label htmlFor="averageCost">Avg Cost</Label>
               <Input
                 id="averageCost"
                 name="averageCost"
                 type="number"
-                defaultValue={vendor?.averageCost || ""}
+                defaultValue={vendor?.averageCost || ''}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">{isEditing ? "Save changes" : "Create Vendor"}</Button>
+            <Button type="submit">
+              {isEditing ? 'Save changes' : 'Create Vendor'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

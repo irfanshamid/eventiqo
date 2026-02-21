@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -9,11 +9,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2 } from "lucide-react";
-import { EventVendorDialog } from "./event-vendor-dialog";
-import { deleteEventVendor } from "@/app/actions/event-vendors";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Trash2 } from 'lucide-react';
+import { EventVendorDialog } from './event-vendor-dialog';
+import { deleteEventVendor } from '@/app/actions/event-vendors';
 
 interface EventVendor {
   id: string;
@@ -38,9 +38,15 @@ interface EventVendorListProps {
   vendors: Vendor[];
 }
 
-export function EventVendorList({ eventId, eventVendors, vendors }: EventVendorListProps) {
+export function EventVendorList({
+  eventId,
+  eventVendors,
+  vendors,
+}: EventVendorListProps) {
   async function handleDelete(id: string) {
-    if (confirm("Are you sure you want to remove this vendor from the event?")) {
+    if (
+      confirm('Are you sure you want to remove this vendor from the event?')
+    ) {
       await deleteEventVendor(id, eventId);
     }
   }
@@ -67,41 +73,46 @@ export function EventVendorList({ eventId, eventVendors, vendors }: EventVendorL
           <TableBody>
             {eventVendors.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center h-24 text-gray-500">
+                <TableCell
+                  colSpan={6}
+                  className="text-center h-24 text-gray-500"
+                >
                   No vendors assigned to this event.
                 </TableCell>
               </TableRow>
             ) : (
               eventVendors.map((ev) => (
                 <TableRow key={ev.id}>
-                  <TableCell className="font-medium">{ev.vendor.name}</TableCell>
+                  <TableCell className="font-medium">
+                    {ev.vendor.name}
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline">{ev.vendor.category}</Badge>
                   </TableCell>
-                  <TableCell>{ev.role || "-"}</TableCell>
+                  <TableCell>{ev.role || '-'}</TableCell>
                   <TableCell>
                     {ev.agreedCost
-                      ? new Intl.NumberFormat("id-ID", {
-                          style: "currency",
-                          currency: "IDR",
+                      ? new Intl.NumberFormat('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR',
                         }).format(ev.agreedCost)
-                      : "-"}
+                      : '-'}
                   </TableCell>
                   <TableCell>
                     <Badge
                       variant={
-                        ev.status === "PAID"
-                          ? "default"
-                          : ev.status === "PARTIAL"
-                          ? "secondary"
-                          : "outline"
+                        ev.status === 'PAID'
+                          ? 'default'
+                          : ev.status === 'PARTIAL'
+                          ? 'secondary'
+                          : 'outline'
                       }
                       className={
-                        ev.status === "PAID"
-                          ? "bg-green-100 text-green-800"
-                          : ev.status === "PARTIAL"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-gray-100 text-gray-800"
+                        ev.status === 'PAID'
+                          ? 'bg-green-100 text-green-800'
+                          : ev.status === 'PARTIAL'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
                       }
                     >
                       {ev.status}
@@ -121,7 +132,7 @@ export function EventVendorList({ eventId, eventVendors, vendors }: EventVendorL
                         vendors={vendors}
                       />
                       <Button
-                        variant="ghost"
+                        variant="secondary"
                         size="icon"
                         className="text-red-500 hover:text-red-700"
                         onClick={() => handleDelete(ev.id)}
