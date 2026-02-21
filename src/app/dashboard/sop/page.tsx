@@ -1,4 +1,3 @@
-import prisma from "@/lib/prisma";
 import {
   Card,
   CardContent,
@@ -6,65 +5,71 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { BookOpen, FileText, Download } from "lucide-react";
+import { BookOpen, FileText, Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-export default async function SOPPage() {
-  const sops = await prisma.sOP.findMany({
-    orderBy: { category: 'asc' },
-  });
-
-  // Group by category
-  const groupedSops = sops.reduce((acc, sop) => {
-    if (!acc[sop.category]) {
-      acc[sop.category] = [];
+export default function SOPPage() {
+  const externalResources = [
+    {
+      category: "SOP & Guidelines",
+      title: "Kumpulan SOP Event Organizer",
+      description: "Akses lengkap ke Standar Operasional Prosedur untuk berbagai jenis event.",
+      link: "https://drive.google.com/drive/folders/1eDnIpqzqoAT_UCP5uRA9eG1DSAVBmXCb?usp=drive_link",
+      icon: BookOpen
+    },
+    {
+      category: "Templates & Documents",
+      title: "Template Dokumen Event",
+      description: "Koleksi template proposal, kontrak, rundown, dan dokumen penting lainnya.",
+      link: "https://drive.google.com/drive/folders/1MhjUSGWAXVRQXwVbKOyMqHA92TFWCdBa?usp=drive_link",
+      icon: FileText
     }
-    acc[sop.category].push(sop);
-    return acc;
-  }, {} as Record<string, typeof sops>);
+  ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight text-[#1F2937]">SOP & Templates</h1>
-        <Button className="bg-[#1E88E5]">Upload New SOP</Button>
       </div>
 
-      {Object.keys(groupedSops).length === 0 ? (
-        <div className="text-center py-10 text-gray-500">
-          No SOPs available. Upload one to get started.
-        </div>
-      ) : (
-        Object.entries(groupedSops).map(([category, items]) => (
-          <div key={category} className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-[#1E88E5]" />
-              {category}
-            </h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {items.map((sop) => (
-                <Card key={sop.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-gray-500" />
-                      {sop.title}
-                    </CardTitle>
-                    <CardDescription>Updated: {new Date(sop.updatedAt).toLocaleDateString()}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-500 mb-4 line-clamp-3">
-                      {sop.content || "No description provided."}
-                    </p>
-                    <Button variant="outline" size="sm" className="w-full">
-                      <Download className="mr-2 h-4 w-4" /> Download
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        ))
-      )}
+      <div className="grid gap-6 md:grid-cols-2">
+        {externalResources.map((resource, index) => {
+          const Icon = resource.icon;
+          return (
+            <Card key={index} className="hover:shadow-lg transition-shadow border-l-4 border-l-[#1E88E5]">
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-[#1E88E5] bg-blue-50 px-3 py-1 rounded-full">
+                    {resource.category}
+                  </span>
+                  <Icon className="h-5 w-5 text-gray-400" />
+                </div>
+                <CardTitle className="text-xl font-bold">{resource.title}</CardTitle>
+                <CardDescription className="text-base mt-2">
+                  {resource.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full bg-[#1E88E5] hover:bg-[#1565C0]" asChild>
+                  <Link href={resource.link} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="mr-2 h-4 w-4" /> 
+                    Akses Google Drive
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+      
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-8">
+        <h3 className="text-yellow-800 font-semibold mb-2">💡 Info Penting</h3>
+        <p className="text-yellow-700 text-sm">
+          Dokumen-dokumen ini tersimpan di Google Drive eksternal. Pastikan Anda login ke akun Google Anda untuk mengaksesnya. 
+          Jika Anda tidak memiliki akses, silakan hubungi administrator.
+        </p>
+      </div>
     </div>
   );
 }
