@@ -101,7 +101,6 @@ export default async function EventDetailPage({
         </div>
         <div className="flex gap-2">
           <EventDialog event={event} />
-          <Button className="bg-[#1E88E5]">Publish Event</Button>
         </div>
       </div>
 

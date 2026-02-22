@@ -70,9 +70,7 @@ export function EventDialog({
       {!isControlled && (
         <DialogTrigger asChild>
           {isEditing ? (
-            <Button variant="secondary" size="sm">
-              Edit
-            </Button>
+            <Button variant="default">Edit Event</Button>
           ) : (
             <Button className="bg-[#1E88E5] hover:bg-[#1565C0]">
               <Plus className="mr-2 h-4 w-4" />
