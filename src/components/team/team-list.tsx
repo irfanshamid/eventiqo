@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 interface User {
   id: string;
@@ -65,6 +66,7 @@ export function TeamList({ initialUsers }: { initialUsers: User[] }) {
   const [isLoading, setIsLoading] = useState(false);
   // Temporary storage for passwords of newly created users in this session
   const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
+  const { toast } = useToast();
 
   useEffect(() => {
     setUsers(initialUsers);
@@ -97,16 +99,20 @@ export function TeamList({ initialUsers }: { initialUsers: User[] }) {
     if (res.success) {
       // Store the password temporarily for this session
       if (res.password) {
-        // We need to wait for the refresh to complete to get the user ID,
-        // but we can map it by username temporarily or just hope the refresh is fast enough?
-        // Actually, we don't have the ID yet.
-        // Let's store by username, and then when rendering, we check.
         setNewPasswords((prev) => ({ ...prev, [username]: res.password! }));
       }
       setIsAddOpen(false);
       router.refresh();
+      toast({
+        title: 'Staff Created',
+        description: `User ${username} created successfully.`,
+      });
     } else {
-      alert(res.error);
+      toast({
+        title: 'Error',
+        description: res.error || 'Failed to create user.',
+        variant: 'destructive',
+      });
     }
   }
 
@@ -119,6 +125,11 @@ export function TeamList({ initialUsers }: { initialUsers: User[] }) {
     setConfirmAction(() => async () => {
       await toggleBanUser(user.id, !user.isBanned);
       router.refresh();
+      setConfirmOpen(false); // Close modal
+      toast({
+        title: user.isBanned ? 'Staff Unbanned' : 'Staff Banned',
+        description: `${user.name} has been ${user.isBanned ? 'unbanned' : 'banned'}.`,
+      });
     });
     setConfirmOpen(true);
   }
@@ -132,40 +143,62 @@ export function TeamList({ initialUsers }: { initialUsers: User[] }) {
     setConfirmAction(() => async () => {
       await deleteUser(user.id);
       router.refresh();
+      setConfirmOpen(false); // Close modal
+      toast({
+        title: 'Staff Deleted',
+        description: `${user.name} has been deleted.`,
+        variant: 'destructive',
+      });
     });
     setConfirmOpen(true);
   }
 
-  async function handleCopyCredentials(user: User) {
+  function openCopyCredentials(user: User) {
     // Check if we have the password in temporary session storage
     if (newPasswords[user.username]) {
       const password = newPasswords[user.username];
       const text = `username = ${user.username}\npassword = ${password}`;
       navigator.clipboard.writeText(text);
-      alert(`Credentials for ${user.username} copied to clipboard!`);
+      toast({
+        title: 'Copied!',
+        description: `Credentials for ${user.username} copied to clipboard.`,
+      });
       return;
     }
 
-    // If not found, ask to reset
-    if (
-      !confirm(
-        `Password for ${user.username} is unknown (encrypted). Do you want to reset it to get new credentials?`,
-      )
-    ) {
-      return;
-    }
+    // If not found, ask to reset using ConfirmDialog
+    setConfirmTitle('Reset Password & Copy');
+    setConfirmDesc(
+      `Password for ${user.username} is unknown (encrypted). Do you want to reset it to get new credentials?`,
+    );
+    setConfirmVariant('default');
+    setConfirmAction(() => async () => {
+      const res = await resetPassword(user.id);
+      if (res.success && res.password) {
+        // Update our local cache
+        setNewPasswords((prev) => ({
+          ...prev,
+          [user.username]: res.password!,
+        }));
+        const text = `username = ${user.username}\npassword = ${res.password}`;
+        navigator.clipboard.writeText(text);
 
-    const res = await resetPassword(user.id);
-    if (res.success && res.password) {
-      // Update our local cache
-      setNewPasswords((prev) => ({ ...prev, [user.username]: res.password! }));
-
-      const text = `username = ${user.username}\npassword = ${res.password}`;
-      navigator.clipboard.writeText(text);
-      alert(`Credentials for ${user.username} copied to clipboard!`);
-    } else {
-      alert('Failed to reset password');
-    }
+        router.refresh();
+        setConfirmOpen(false); // Close modal
+        toast({
+          title: 'Success',
+          description: `Credentials for ${user.username} copied to clipboard.`,
+        });
+      } else {
+        setConfirmOpen(false); // Close modal
+        toast({
+          title: 'Error',
+          description: 'Failed to reset password.',
+          variant: 'destructive',
+        });
+      }
+    });
+    setConfirmOpen(true);
   }
 
   return (
@@ -303,7 +336,7 @@ export function TeamList({ initialUsers }: { initialUsers: User[] }) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                          onClick={() => handleCopyCredentials(user)}
+                          onClick={() => openCopyCredentials(user)}
                         >
                           <Copy className="mr-2 h-4 w-4 text-blue-600" /> Copy
                           Credentials

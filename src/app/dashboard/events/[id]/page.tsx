@@ -197,6 +197,8 @@ export default async function EventDetailPage({
                 maximumFractionDigits: 0,
               }).format(event.totalBudget),
             }}
+            draftRabItems={event.draftRabItems}
+            vendors={event.vendors.map((v) => v.vendor)}
           />
         </TabsContent>
       </Tabs>
