@@ -7,6 +7,7 @@ import prisma from '@/lib/prisma';
 import { EventDialog } from '@/components/events/event-dialog';
 import { EventDocumentList } from '@/components/events/documents/event-document-list';
 import { TaskList } from '@/components/tasks/task-list';
+import { DraftRabList } from '@/components/events/draft-rab/draft-rab-list';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -35,6 +36,9 @@ export default async function EventDetailPage({
         },
       },
       expenses: true,
+      draftRabItems: {
+        orderBy: { createdAt: 'asc' },
+      },
     },
   });
 
@@ -108,6 +112,7 @@ export default async function EventDetailPage({
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
+          <TabsTrigger value="draft-rab">Draft RAB</TabsTrigger>
           <TabsTrigger value="budget">Budget & Finance</TabsTrigger>
           <TabsTrigger value="vendors">Vendors</TabsTrigger>
           <TabsTrigger value="documents">Proposal & Contracts</TabsTrigger>
@@ -145,12 +150,16 @@ export default async function EventDetailPage({
           />
         </TabsContent>
 
+        <TabsContent value="draft-rab">
+          <DraftRabList items={event.draftRabItems} eventId={event.id} />
+        </TabsContent>
+
         <TabsContent value="budget">
           <BudgetPlanner
             eventId={event.id}
             totalBudget={event.totalBudget}
             targetMargin={event.targetMargin}
-            expenses={event.expenses}
+            draftRabItems={event.draftRabItems}
           />
         </TabsContent>
 
@@ -185,6 +194,7 @@ export default async function EventDetailPage({
               totalBudget: new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
+                maximumFractionDigits: 0,
               }).format(event.totalBudget),
             }}
           />

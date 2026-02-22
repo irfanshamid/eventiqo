@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -13,40 +11,45 @@ import {
   TableFooter,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ExpenseDialog } from '@/components/events/budget/expense-dialog';
-import { deleteExpense } from '@/app/actions/expenses';
 
-interface Expense {
+interface DraftRabItem {
   id: string;
-  description: string;
-  estimatedAmount: number;
-  actualAmount: number;
   category: string;
-  status: string;
+  totalPriceRab: number;
+  totalPriceReal: number | null;
 }
 
 interface BudgetPlannerProps {
   eventId: string;
   totalBudget: number;
   targetMargin?: number;
-  expenses: Expense[];
+  draftRabItems: DraftRabItem[];
 }
 
 export function BudgetPlanner({
   eventId,
   totalBudget,
   targetMargin = 20,
-  expenses,
+  draftRabItems,
 }: BudgetPlannerProps) {
-  // Calculations
-  const totalEstimatedCost = expenses.reduce(
-    (acc, item) => acc + item.estimatedAmount,
+  // Calculations based on Draft RAB
+  const categoryStats = draftRabItems.reduce((acc, item) => {
+    if (!acc[item.category]) {
+      acc[item.category] = { estimated: 0, real: 0 };
+    }
+    acc[item.category].estimated += item.totalPriceRab;
+    acc[item.category].real += (item.totalPriceReal || 0);
+    return acc;
+  }, {} as Record<string, { estimated: number; real: number }>);
+
+  const totalEstimatedCost = Object.values(categoryStats).reduce(
+    (acc, item) => acc + item.estimated,
     0,
   );
-  const totalRealCost = expenses.reduce(
-    (acc, item) => acc + item.actualAmount,
+  const totalRealCost = Object.values(categoryStats).reduce(
+    (acc, item) => acc + item.real,
     0,
   );
 
@@ -66,12 +69,6 @@ export function BudgetPlanner({
       maximumFractionDigits: 0,
     }).format(value);
   };
-
-  async function handleDelete(id: string) {
-    if (confirm('Are you sure you want to delete this expense?')) {
-      await deleteExpense(id, eventId);
-    }
-  }
 
   return (
     <div className="space-y-6">
@@ -151,49 +148,42 @@ export function BudgetPlanner({
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Budget Breakdown</CardTitle>
-            <ExpenseDialog eventId={eventId} />
+            <CardTitle>Budget Breakdown (Derived from Draft RAB)</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Kategori</TableHead>
-                <TableHead>Deskripsi Item</TableHead>
-                <TableHead className="text-right">Est. Cost</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead className="text-right">Est. Cost (RAB)</TableHead>
                 <TableHead className="text-right">Real Cost</TableHead>
                 <TableHead className="text-right">Diff</TableHead>
-                <TableHead>Status Bayar</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {expenses.length === 0 ? (
+              {Object.entries(categoryStats).length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={4}
                     className="text-center h-24 text-gray-500"
                   >
-                    No expenses recorded yet.
+                    No RAB items recorded yet.
                   </TableCell>
                 </TableRow>
               ) : (
-                expenses.map((item) => {
-                  const diff = item.estimatedAmount - item.actualAmount;
+                Object.entries(categoryStats).map(([category, stats]) => {
+                  const diff = stats.estimated - stats.real;
                   return (
-                    <TableRow key={item.id}>
+                    <TableRow key={category}>
                       <TableCell>
-                        <Badge variant="outline">{item.category}</Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {item.description}
+                        <Badge variant="outline">{category}</Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatCurrency(item.estimatedAmount)}
+                        {formatCurrency(stats.estimated)}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatCurrency(item.actualAmount)}
+                        {formatCurrency(stats.real)}
                       </TableCell>
                       <TableCell
                         className={cn(
@@ -203,30 +193,6 @@ export function BudgetPlanner({
                       >
                         {formatCurrency(diff)}
                       </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            item.status === 'PAID' ? 'default' : 'secondary'
-                          }
-                          className={
-                            item.status === 'PAID'
-                              ? 'bg-green-100 text-green-800 hover:bg-green-100'
-                              : 'bg-red-100 text-red-800 hover:bg-red-100'
-                          }
-                        >
-                          {item.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="secondary"
-                          size="icon"
-                          className="h-8 w-8 text-red-500"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
                     </TableRow>
                   );
                 })
@@ -234,7 +200,7 @@ export function BudgetPlanner({
             </TableBody>
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={2} className="font-bold">
+                <TableCell className="font-bold">
                   Total
                 </TableCell>
                 <TableCell className="text-right font-bold">
@@ -246,7 +212,6 @@ export function BudgetPlanner({
                 <TableCell className="text-right font-bold">
                   {formatCurrency(totalEstimatedCost - totalRealCost)}
                 </TableCell>
-                <TableCell colSpan={2}></TableCell>
               </TableRow>
             </TableFooter>
           </Table>

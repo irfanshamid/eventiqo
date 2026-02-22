@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -54,6 +55,7 @@ model Event {
   expenses    Expense[]
   proposals   Proposal[]
   contracts   Contract[]
+  draftRabItems DraftRabItem[]
 }
 
 model Task {
@@ -154,7 +156,7 @@ model SOP {
   id          String   @id @default(cuid())
   title       String
   category    String
-  content     String?  // Markdown or link to file
+  content     String?  @db.Text
   fileUrl     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -164,8 +166,30 @@ model Template {
   id          String   @id @default(cuid())
   title       String
   category    String
-  content     String?
+  content     String?  @db.Text
   fileUrl     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model DraftRabItem {
+  id              String   @id @default(cuid())
+  category        String
+  item            String
+  specification   String?
+  qty             Int
+  qtyType         String
+  frequency       Int
+  frequencyType   String
+  unitPriceRab    Float
+  totalPriceRab   Float
+  unitPriceReal   Float?
+  totalPriceReal  Float?
+  remarks         String?
+
+  eventId         String
+  event           Event    @relation(fields: [eventId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

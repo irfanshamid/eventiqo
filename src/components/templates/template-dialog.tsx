@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -10,19 +10,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
-import { createTemplate, updateTemplate } from "@/app/actions/templates";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { Plus } from 'lucide-react';
+import { createTemplate, updateTemplate } from '@/app/actions/templates';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 interface Template {
   id: string;
@@ -31,11 +31,18 @@ interface Template {
   content: string | null;
 }
 
-const CATEGORIES = ["Proposal", "Contract", "Invoice", "Letter"];
+const CATEGORIES = ['Proposal', 'Contract'];
 
 export function TemplateDialog({ template }: { template?: Template }) {
   const [open, setOpen] = useState(false);
+  const [content, setContent] = useState(template?.content || '');
   const isEditing = !!template;
+
+  useEffect(() => {
+    if (open) {
+      setContent(template?.content || '');
+    }
+  }, [open, template]);
 
   async function handleSubmit(formData: FormData) {
     if (isEditing && template) {
@@ -59,21 +66,21 @@ export function TemplateDialog({ template }: { template?: Template }) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <form action={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Edit Template" : "Create New Template"}</DialogTitle>
+            <DialogTitle>
+              {isEditing ? 'Edit Template' : 'Create New Template'}
+            </DialogTitle>
             <DialogDescription>
               {isEditing
-                ? "Update template content and details."
-                : "Create a new document template."}
+                ? 'Update template content and details.'
+                : 'Create a new document template.'}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="title">
-                Title
-              </Label>
+              <Label htmlFor="title">Title</Label>
               <Input
                 id="title"
                 name="title"
@@ -82,11 +89,12 @@ export function TemplateDialog({ template }: { template?: Template }) {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="category">
-                Category
-              </Label>
+              <Label htmlFor="category">Category</Label>
               <div>
-                <Select name="category" defaultValue={template?.category || CATEGORIES[0]}>
+                <Select
+                  name="category"
+                  defaultValue={template?.category || CATEGORIES[0]}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
@@ -101,20 +109,20 @@ export function TemplateDialog({ template }: { template?: Template }) {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="content">
-                Content (Markdown/Text)
-              </Label>
-              <Textarea
-                id="content"
-                name="content"
-                defaultValue={template?.content || ""}
-                className="h-[200px]"
-                required
-              />
+              <Label htmlFor="content">Content</Label>
+              <div className="min-h-[300px]">
+                <RichTextEditor
+                  content={content}
+                  onChange={setContent}
+                />
+                <input type="hidden" name="content" value={content} />
+              </div>
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">{isEditing ? "Save changes" : "Create Template"}</Button>
+            <Button type="submit">
+              {isEditing ? 'Save changes' : 'Create Template'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -124,3 +124,38 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+    height: 0;
+    border: none;
+    margin: 0;
+  }
+}
+
+.page-break {
+  page-break-after: always;
+  height: 20px;
+  background: repeating-linear-gradient(
+    45deg,
+    #f0f0f0,
+    #f0f0f0 10px,
+    #ffffff 10px,
+    #ffffff 20px
+  );
+  border-bottom: 2px dashed #ccc;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.page-break::after {
+  content: "Page Break";
+}
