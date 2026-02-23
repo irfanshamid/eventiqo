@@ -14,10 +14,7 @@ import {
   BookOpen,
   Settings,
   PieChart,
-  Menu,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Image from 'next/image';
 
 const sidebarItems = [
@@ -73,8 +70,19 @@ const sidebarItems = [
   },
 ];
 
-export function Sidebar() {
+const staffAllowedRoutes = [
+  '/dashboard/tasks',
+  '/dashboard/team',
+  '/dashboard/settings',
+];
+
+export function Sidebar({ userRole }: { userRole?: string }) {
   const pathname = usePathname();
+
+  const filteredItems =
+    userRole === 'STAFF'
+      ? sidebarItems.filter((item) => staffAllowedRoutes.includes(item.href))
+      : sidebarItems;
 
   return (
     <div className="flex h-full flex-col bg-[#F1F5F9] text-slate-700 border-r border-slate-200">
@@ -91,7 +99,7 @@ export function Sidebar() {
       </div>
       <div className="flex-1 overflow-y-auto py-4">
         <nav className="space-y-1 px-3">
-          {sidebarItems.map((item) => (
+          {filteredItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}

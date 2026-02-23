@@ -39,7 +39,7 @@ export default async function TeamPage() {
           Team Management
         </h1>
       </div>
-      <TeamList initialUsers={serializedUsers} />
+      <TeamList initialUsers={serializedUsers} currentUserRole={session.user.role} />
     </div>
   );
 }

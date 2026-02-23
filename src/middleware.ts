@@ -44,6 +44,9 @@ export async function middleware(request: NextRequest) {
 
     // Prevent login page access if already logged in
     if (path === '/login') {
+      if (session.user.role === 'STAFF') {
+        return NextResponse.redirect(new URL('/dashboard/tasks', request.nextUrl));
+      }
       return NextResponse.redirect(new URL('/dashboard/panel', request.nextUrl));
     }
   }

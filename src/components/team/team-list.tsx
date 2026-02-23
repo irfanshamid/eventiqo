@@ -59,7 +59,12 @@ interface User {
   createdAt: Date;
 }
 
-export function TeamList({ initialUsers }: { initialUsers: User[] }) {
+interface TeamListProps {
+  initialUsers: User[];
+  currentUserRole: string;
+}
+
+export function TeamList({ initialUsers, currentUserRole }: TeamListProps) {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -67,6 +72,8 @@ export function TeamList({ initialUsers }: { initialUsers: User[] }) {
   // Temporary storage for passwords of newly created users in this session
   const [newPasswords, setNewPasswords] = useState<Record<string, string>>({});
   const { toast } = useToast();
+
+  const isStaff = currentUserRole === 'STAFF';
 
   useEffect(() => {
     setUsers(initialUsers);
@@ -213,55 +220,57 @@ export function TeamList({ initialUsers }: { initialUsers: User[] }) {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#1E88E5] hover:bg-[#1565C0]">
-              <UserPlus className="mr-2 h-4 w-4" /> Add Member
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <form action={handleCreate}>
-              <DialogHeader>
-                <DialogTitle>Add New Staff</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    required
-                    placeholder="John Doe"
-                  />
+        {!isStaff && (
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#1E88E5] hover:bg-[#1565C0]">
+                <UserPlus className="mr-2 h-4 w-4" /> Add Member
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <form action={handleCreate}>
+                <DialogHeader>
+                  <DialogTitle>Add New Staff</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      required
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      name="username"
+                      required
+                      placeholder="johndoe"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email (Optional)</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                  <input type="hidden" name="role" value="STAFF" />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    name="username"
-                    required
-                    placeholder="johndoe"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email (Optional)</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="john@example.com"
-                  />
-                </div>
-                <input type="hidden" name="role" value="STAFF" />
-              </div>
-              <DialogFooter>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Creating...' : 'Create Account'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <DialogFooter>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Creating...' : 'Create Account'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="rounded-md border bg-white overflow-hidden">
@@ -272,14 +281,14 @@ export function TeamList({ initialUsers }: { initialUsers: User[] }) {
               <TableHead>Username</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              {!isStaff && <TableHead className="text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredUsers.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={isStaff ? 4 : 5}
                   className="text-center h-32 text-gray-500"
                 >
                   No staff members found.
@@ -327,42 +336,44 @@ export function TeamList({ initialUsers }: { initialUsers: User[] }) {
                       </Badge>
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => openCopyCredentials(user)}
-                        >
-                          <Copy className="mr-2 h-4 w-4 text-blue-600" /> Copy
-                          Credentials
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => openBanConfirm(user)}>
-                          {user.isBanned ? (
-                            <>
-                              <CheckCircle className="mr-2 h-4 w-4 text-green-600" />{' '}
-                              Unban
-                            </>
-                          ) : (
-                            <>
-                              <Ban className="mr-2 h-4 w-4 text-orange-600" />{' '}
-                              Ban
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                          onClick={() => openDeleteConfirm(user)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  {!isStaff && (
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => openCopyCredentials(user)}
+                          >
+                            <Copy className="mr-2 h-4 w-4 text-blue-600" /> Copy
+                            Credentials
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openBanConfirm(user)}>
+                            {user.isBanned ? (
+                              <>
+                                <CheckCircle className="mr-2 h-4 w-4 text-green-600" />{' '}
+                                Unban
+                              </>
+                            ) : (
+                              <>
+                                <Ban className="mr-2 h-4 w-4 text-orange-600" />{' '}
+                                Ban
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                            onClick={() => openDeleteConfirm(user)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}

@@ -44,6 +44,8 @@ export async function loginAction(prevState: any, formData: FormData) {
     redirect("/complete-profile");
   } else if (user.role === 'ADMIN') {
     redirect("/admin");
+  } else if (user.role === 'STAFF') {
+    redirect("/dashboard/tasks");
   } else {
     redirect("/dashboard/panel");
   }
