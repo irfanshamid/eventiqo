@@ -32,6 +32,7 @@ interface Task {
   assignee?: { id: string; name: string | null } | null;
   priority: string;
   status: string;
+  dueDate: Date | null;
 }
 
 interface TaskDialogProps {
@@ -141,6 +142,20 @@ export function TaskDialog({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="dueDate">Due Date</Label>
+              <Input
+                id="dueDate"
+                name="dueDate"
+                type="date"
+                defaultValue={
+                  task?.dueDate
+                    ? new Date(task.dueDate).toISOString().split('T')[0]
+                    : ''
+                }
+                disabled={readOnly}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="priority">Priority</Label>

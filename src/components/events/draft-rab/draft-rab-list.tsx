@@ -16,11 +16,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, Download } from 'lucide-react';
 import { deleteDraftRabItem } from '@/app/actions/draft-rab';
 import { DraftRabDialog } from './draft-rab-dialog';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/hooks/use-toast';
+import * as XLSX from 'xlsx';
 
 interface DraftRabItem {
   id: string;
@@ -49,13 +50,16 @@ export function DraftRabList({
   const [deletingItem, setDeletingItem] = useState<DraftRabItem | null>(null);
   const { toast } = useToast();
 
-  const groupedItems = items.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
-    }
-    acc[item.category].push(item);
-    return acc;
-  }, {} as Record<string, DraftRabItem[]>);
+  const groupedItems = items.reduce(
+    (acc, item) => {
+      if (!acc[item.category]) {
+        acc[item.category] = [];
+      }
+      acc[item.category].push(item);
+      return acc;
+    },
+    {} as Record<string, DraftRabItem[]>,
+  );
 
   const handleDelete = async () => {
     if (deletingItem) {
@@ -73,6 +77,127 @@ export function DraftRabList({
     }
   };
 
+  const handleDownloadExcel = () => {
+    // 1. Prepare Data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: any[] = [];
+
+    // Header
+    data.push([
+      'Category',
+      'Item',
+      'Specification',
+      'Qty',
+      'Unit',
+      'Freq',
+      'Freq Unit',
+      'Price/Unit (RAB)',
+      'Total Price (RAB)',
+      'Price/Unit (Real)',
+      'Total Price (Real)',
+      'Remarks',
+    ]);
+
+    // Rows
+    Object.entries(groupedItems).forEach(([category, categoryItems]) => {
+      // Category Header Row
+      data.push([
+        category.toUpperCase(),
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+      ]);
+
+      let subTotalRab = 0;
+      let subTotalReal = 0;
+
+      categoryItems.forEach((item) => {
+        subTotalRab += item.totalPriceRab;
+        subTotalReal += item.totalPriceReal || 0;
+
+        data.push([
+          '', // Indent for item under category
+          item.item,
+          item.specification || '',
+          item.qty,
+          item.qtyType,
+          item.frequency,
+          item.frequencyType,
+          item.unitPriceRab,
+          item.totalPriceRab,
+          item.unitPriceReal || 0,
+          item.totalPriceReal || 0,
+          item.remarks || '',
+        ]);
+      });
+
+      // Subtotal Row
+      data.push([
+        `Subtotal ${category}`,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        subTotalRab,
+        '',
+        subTotalReal,
+        '',
+      ]);
+
+      // Empty row for spacing
+      data.push([]);
+    });
+
+    // Grand Total Row
+    const grandTotalRab = items.reduce(
+      (sum, item) => sum + item.totalPriceRab,
+      0,
+    );
+    const grandTotalReal = items.reduce(
+      (sum, item) => sum + (item.totalPriceReal || 0),
+      0,
+    );
+
+    data.push([
+      'GRAND TOTAL',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      grandTotalRab,
+      '',
+      grandTotalReal,
+      '',
+    ]);
+
+    // 2. Create Worksheet
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // 3. Create Workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Draft RAB');
+
+    // 4. Download
+    XLSX.writeFile(
+      wb,
+      `Draft_RAB_${new Date().toISOString().split('T')[0]}.xlsx`,
+    );
+  };
+
   const grandTotalRab = items.reduce(
     (sum, item) => sum + item.totalPriceRab,
     0,
@@ -86,6 +211,14 @@ export function DraftRabList({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">Draft RAB</h2>
+        <Button
+          onClick={handleDownloadExcel}
+          variant="outline"
+          className="gap-2"
+        >
+          <Download className="h-4 w-4" />
+          Download Excel
+        </Button>
       </div>
 
       <div className="rounded-md border bg-white overflow-hidden">
@@ -247,13 +380,6 @@ export function DraftRabList({
       </div>
 
       <DraftRabDialog eventId={eventId} />
-
-      {/* <DraftRabDialog
-        eventId={eventId}
-        item={editingItem}
-        open={!!editingItem}
-        onOpenChange={(open) => !open && setEditingItem(null)}
-      /> */}
 
       <ConfirmDialog
         open={!!deletingItem}

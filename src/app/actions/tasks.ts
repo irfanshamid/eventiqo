@@ -9,14 +9,16 @@ export async function createTask(formData: FormData) {
   const assigneeId = formData.get("assigneeId") as string;
   const priority = formData.get("priority") as string;
   const status = formData.get("status") as string;
+  const dueDate = formData.get("dueDate") as string;
 
   await prisma.task.create({
     data: {
       title,
       eventId,
-      assigneeId: assigneeId || null,
+      assigneeId: assigneeId === "unassigned" ? null : assigneeId || null,
       priority,
       status,
+      dueDate: dueDate ? new Date(dueDate) : null,
     },
   });
 
@@ -29,15 +31,17 @@ export async function updateTask(id: string, formData: FormData) {
   const assigneeId = formData.get("assigneeId") as string;
   const priority = formData.get("priority") as string;
   const status = formData.get("status") as string;
+  const dueDate = formData.get("dueDate") as string;
 
   await prisma.task.update({
     where: { id },
     data: {
       title,
       eventId,
-      assigneeId: assigneeId || null,
+      assigneeId: assigneeId === "unassigned" ? null : assigneeId || null,
       priority,
       status,
+      dueDate: dueDate ? new Date(dueDate) : null,
     },
   });
 

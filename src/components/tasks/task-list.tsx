@@ -20,6 +20,7 @@ import {
   Eye,
   Edit,
   Trash2,
+  Calendar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,6 +48,7 @@ interface Task {
   assigneeId: string | null;
   event: { id: string; name: string };
   assignee: { id: string; name: string | null } | null;
+  dueDate: Date | null;
 }
 
 interface TaskListProps {
@@ -143,6 +145,7 @@ export function TaskList({
               <TableHead className="py-4 pl-6">Task Title</TableHead>
               <TableHead>Event</TableHead>
               <TableHead>Assignee</TableHead>
+              <TableHead>Due Date</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right pr-6">Actions</TableHead>
@@ -152,7 +155,7 @@ export function TaskList({
             {paginatedTasks.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   className="text-center h-32 text-gray-500"
                 >
                   No tasks found.
@@ -172,6 +175,12 @@ export function TaskList({
                     <div className="flex items-center gap-2">
                       <User className="h-3 w-3 text-gray-400" />
                       {task.assignee?.name || 'Unassigned'}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Calendar className="h-3 w-3" />
+                        {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '-'}
                     </div>
                   </TableCell>
                   <TableCell>
