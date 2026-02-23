@@ -50,6 +50,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, loading = false, disabled, children, ...props }, ref) => {
     const Comp = asChild ? Slot.Root : "button"
 
+    // If asChild is true, we must NOT render the loading spinner directly inside the Slot.Root
+    // because Slot expects a single React element child.
+    // If loading is needed with asChild, the consumer should handle it inside the child element.
+    if (asChild) {
+      return (
+        <Comp
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref}
+          disabled={disabled || loading}
+          {...props}
+        >
+          {children}
+        </Comp>
+      )
+    }
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
