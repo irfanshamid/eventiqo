@@ -51,15 +51,26 @@ export function TaskDialog({
   trigger,
 }: TaskDialogProps) {
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const isEditing = !!task;
 
-  async function handleSubmit(formData: FormData) {
-    if (isEditing && task) {
-      await updateTask(task.id, formData);
-    } else {
-      await createTask(formData);
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsLoading(true);
+    const formData = new FormData(e.currentTarget);
+    
+    try {
+      if (isEditing && task) {
+        await updateTask(task.id, formData);
+      } else {
+        await createTask(formData);
+      }
+      setOpen(false);
+    } catch (error) {
+      console.error('Failed to save task:', error);
+    } finally {
+      setIsLoading(false);
     }
-    setOpen(false);
   }
 
   return (
@@ -80,7 +91,7 @@ export function TaskDialog({
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <form action={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
               {isEditing
@@ -189,7 +200,7 @@ export function TaskDialog({
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">
+            <Button type="submit" loading={isLoading}>
               {isEditing ? 'Save changes' : 'Create Task'}
             </Button>
           </DialogFooter>

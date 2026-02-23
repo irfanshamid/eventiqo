@@ -48,15 +48,26 @@ export function EventVendorDialog({
   vendors,
 }: EventVendorDialogProps) {
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const isEditing = !!eventVendor;
 
-  async function handleSubmit(formData: FormData) {
-    if (isEditing && eventVendor) {
-      await updateEventVendor(eventVendor.id, eventId, formData);
-    } else {
-      await addEventVendor(eventId, formData);
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsLoading(true);
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      if (isEditing && eventVendor) {
+        await updateEventVendor(eventVendor.id, eventId, formData);
+      } else {
+        await addEventVendor(eventId, formData);
+      }
+      setOpen(false);
+    } catch (error) {
+      console.error('Failed to save vendor:', error);
+    } finally {
+      setIsLoading(false);
     }
-    setOpen(false);
   }
 
   return (
@@ -73,7 +84,7 @@ export function EventVendorDialog({
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <form action={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
               {isEditing ? 'Edit Vendor' : 'Add Vendor to Event'}
@@ -144,7 +155,7 @@ export function EventVendorDialog({
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">
+            <Button type="submit" loading={isLoading}>
               {isEditing ? 'Save changes' : 'Add Vendor'}
             </Button>
           </DialogFooter>

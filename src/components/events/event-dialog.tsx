@@ -44,6 +44,7 @@ export function EventDialog({
   onOpenChange?: (open: boolean) => void;
 }) {
   const [internalOpen, setInternalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
   const isEditing = !!event;
@@ -56,13 +57,22 @@ export function EventDialog({
     }
   };
 
-  async function handleSubmit(formData: FormData) {
-    if (isEditing && event) {
-      await updateEvent(event.id, formData);
-    } else {
-      await createEvent(formData);
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsLoading(true);
+    const formData = new FormData(e.currentTarget);
+    try {
+      if (isEditing && event) {
+        await updateEvent(event.id, formData);
+      } else {
+        await createEvent(formData);
+      }
+      setOpen(false);
+    } catch (error) {
+      console.error('Failed to save event:', error);
+    } finally {
+      setIsLoading(false);
     }
-    setOpen(false);
   }
 
   return (
@@ -80,7 +90,7 @@ export function EventDialog({
         </DialogTrigger>
       )}
       <DialogContent className="sm:max-w-[425px]">
-        <form action={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
               {isEditing ? 'Edit Event' : 'Add New Event'}
@@ -166,7 +176,7 @@ export function EventDialog({
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">
+            <Button type="submit" loading={isLoading}>
               {isEditing ? 'Save changes' : 'Create Event'}
             </Button>
           </DialogFooter>
