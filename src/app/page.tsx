@@ -67,7 +67,12 @@ export default function LandingPage() {
               className="bg-orange-500 hover:bg-orange-600 text-black px-8 h-12 text-lg w-full sm:w-auto shadow-lg hover:shadow-xl transition-all border-none"
               asChild
             >
-              <Link href="/demo">Request Demo</Link>
+              <Link
+                href="https://mudakayarayaid.myr.id/pl/eventiqo"
+                target="_blank"
+              >
+                Akses Sekarang
+              </Link>
             </Button>
           </div>
         </section>
