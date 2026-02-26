@@ -21,7 +21,7 @@ import { deleteDraftRabItem } from '@/app/actions/draft-rab';
 import { DraftRabDialog } from './draft-rab-dialog';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/hooks/use-toast';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 
 interface DraftRabItem {
   id: string;
@@ -82,8 +82,35 @@ export function DraftRabList({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: any[] = [];
 
+    // Styling constants
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "000000" } },
+      fill: { fgColor: { rgb: "D3D3D3" } }, // Light Gray
+      alignment: { horizontal: "center" }
+    };
+
+    const categoryStyle = {
+      font: { bold: true, color: { rgb: "000000" } },
+      fill: { fgColor: { rgb: "E0F7FA" } }, // Light Blue
+    };
+
+    const subtotalStyle = {
+      font: { bold: true },
+      fill: { fgColor: { rgb: "FFF9C4" } }, // Light Yellow
+    };
+
+    const grandTotalStyle = {
+      font: { bold: true, sz: 14 },
+      fill: { fgColor: { rgb: "D3D3D3" } }, // Light Gray
+    };
+
+    // Helper to create cell with style
+    const createCell = (value: any, style: any = {}) => {
+      return { v: value, s: style };
+    };
+
     // Header
-    data.push([
+    const headers = [
       'Category',
       'Item',
       'Specification',
@@ -96,25 +123,15 @@ export function DraftRabList({
       'Price/Unit (Real)',
       'Total Price (Real)',
       'Remarks',
-    ]);
+    ];
+    data.push(headers.map(h => createCell(h, headerStyle)));
 
     // Rows
     Object.entries(groupedItems).forEach(([category, categoryItems]) => {
       // Category Header Row
-      data.push([
-        category.toUpperCase(),
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-      ]);
+      const categoryRow = new Array(12).fill(createCell('', categoryStyle));
+      categoryRow[0] = createCell(category.toUpperCase(), categoryStyle);
+      data.push(categoryRow);
 
       let subTotalRab = 0;
       let subTotalReal = 0;
@@ -124,36 +141,27 @@ export function DraftRabList({
         subTotalReal += item.totalPriceReal || 0;
 
         data.push([
-          '', // Indent for item under category
-          item.item,
-          item.specification || '',
-          item.qty,
-          item.qtyType,
-          item.frequency,
-          item.frequencyType,
-          item.unitPriceRab,
-          item.totalPriceRab,
-          item.unitPriceReal || 0,
-          item.totalPriceReal || 0,
-          item.remarks || '',
+          createCell(''), // Indent for item under category
+          createCell(item.item),
+          createCell(item.specification || ''),
+          createCell(item.qty),
+          createCell(item.qtyType),
+          createCell(item.frequency),
+          createCell(item.frequencyType),
+          createCell(item.unitPriceRab, { numFmt: '#,##0' }),
+          createCell(item.totalPriceRab, { numFmt: '#,##0' }),
+          createCell(item.unitPriceReal || 0, { numFmt: '#,##0' }),
+          createCell(item.totalPriceReal || 0, { numFmt: '#,##0' }),
+          createCell(item.remarks || ''),
         ]);
       });
 
       // Subtotal Row
-      data.push([
-        `Subtotal ${category}`,
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        subTotalRab,
-        '',
-        subTotalReal,
-        '',
-      ]);
+      const subtotalRow = new Array(12).fill(createCell('', subtotalStyle));
+      subtotalRow[0] = createCell(`Subtotal ${category}`, subtotalStyle);
+      subtotalRow[8] = createCell(subTotalRab, { ...subtotalStyle, numFmt: '#,##0' });
+      subtotalRow[10] = createCell(subTotalReal, { ...subtotalStyle, numFmt: '#,##0' });
+      data.push(subtotalRow);
 
       // Empty row for spacing
       data.push([]);
@@ -169,23 +177,31 @@ export function DraftRabList({
       0,
     );
 
-    data.push([
-      'GRAND TOTAL',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      grandTotalRab,
-      '',
-      grandTotalReal,
-      '',
-    ]);
+    const grandTotalRow = new Array(12).fill(createCell('', grandTotalStyle));
+    grandTotalRow[0] = createCell('GRAND TOTAL', grandTotalStyle);
+    grandTotalRow[8] = createCell(grandTotalRab, { ...grandTotalStyle, numFmt: '#,##0' });
+    grandTotalRow[10] = createCell(grandTotalReal, { ...grandTotalStyle, numFmt: '#,##0' });
+    
+    data.push(grandTotalRow);
 
     // 2. Create Worksheet
     const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Set column widths
+    ws['!cols'] = [
+      { wch: 20 }, // Category
+      { wch: 25 }, // Item
+      { wch: 25 }, // Specification
+      { wch: 8 },  // Qty
+      { wch: 8 },  // Unit
+      { wch: 8 },  // Freq
+      { wch: 8 },  // Freq Unit
+      { wch: 15 }, // Price/Unit (RAB)
+      { wch: 15 }, // Total Price (RAB)
+      { wch: 15 }, // Price/Unit (Real)
+      { wch: 15 }, // Total Price (Real)
+      { wch: 20 }, // Remarks
+    ];
 
     // 3. Create Workbook
     const wb = XLSX.utils.book_new();
