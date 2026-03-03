@@ -47,6 +47,12 @@ export function UserList({ users }: { users: User[] }) {
     password: string;
   } | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [roleFilter, setRoleFilter] = useState<string>('ALL');
+
+  const filteredUsers = users.filter((user) => {
+    if (roleFilter === 'ALL') return true;
+    return user.role === roleFilter;
+  });
 
   async function handleCreate(formData: FormData) {
     const res = await createUser(formData);
@@ -98,53 +104,72 @@ export function UserList({ users }: { users: User[] }) {
         </div>
       )}
 
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">User Management</h2>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#1E88E5]">
-              <UserPlus className="mr-2 h-4 w-4" /> Add User
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <form action={handleCreate}>
-              <DialogHeader>
-                <DialogTitle>Create New User</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" name="name" required />
+      <div className="flex justify-between items-center gap-4">
+        <div>
+          <h2 className="text-xl font-semibold">User Management</h2>
+          <p className="text-sm text-gray-500">
+            {filteredUsers.length} user ditampilkan
+          </p>
+        </div>
+        <div className="flex gap-2 ml-auto">
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="w-[180px] bg-white">
+              <SelectValue placeholder="Filter by Role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Roles</SelectItem>
+              <SelectItem value="ADMIN">Admin</SelectItem>
+              <SelectItem value="MANAGER">Manager</SelectItem>
+              <SelectItem value="STAFF">Staff</SelectItem>
+              <SelectItem value="USER">User</SelectItem>
+            </SelectContent>
+          </Select>
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#1E88E5]">
+                <UserPlus className="mr-2 h-4 w-4" /> Add User
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <form action={handleCreate}>
+                <DialogHeader>
+                  <DialogTitle>Create New User</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" name="name" required />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input id="username" name="username" required />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email (Optional)</Label>
+                    <Input id="email" name="email" type="email" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="role">Role</Label>
+                    <Select name="role" defaultValue="USER">
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="USER">User</SelectItem>
+                        <SelectItem value="MANAGER">Manager</SelectItem>
+                        <SelectItem value="STAFF">Staff</SelectItem>
+                        <SelectItem value="ADMIN">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input id="username" name="username" required />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email (Optional)</Label>
-                  <Input id="email" name="email" type="email" />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="role">Role</Label>
-                  <Select name="role" defaultValue="USER">
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="USER">User</SelectItem>
-                      <SelectItem value="MANAGER">Manager</SelectItem>
-                      <SelectItem value="STAFF">Staff</SelectItem>
-                      <SelectItem value="ADMIN">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit">Create</Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <DialogFooter>
+                  <Button type="submit">Create</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="rounded-md border bg-white">
@@ -160,7 +185,7 @@ export function UserList({ users }: { users: User[] }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">
                   {user.name || '-'}
