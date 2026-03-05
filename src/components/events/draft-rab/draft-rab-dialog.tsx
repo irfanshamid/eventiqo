@@ -39,6 +39,9 @@ export function DraftRabDialog({ eventId, item, trigger, open: controlledOpen, o
   const isOpen = isControlled ? controlledOpen : open;
   const onOpenChange = isControlled ? setControlledOpen : setOpen;
 
+  // Add logging to debug
+  // console.log("DraftRabDialog render:", { isOpen, item });
+
   async function handleSubmit(formData: FormData) {
     setLoading(true);
     try {
@@ -74,7 +77,7 @@ export function DraftRabDialog({ eventId, item, trigger, open: controlledOpen, o
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
-              <Select name="category" defaultValue={item?.category} required>
+              <Select name="category" defaultValue={item?.category} key={item?.category} required>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
@@ -89,48 +92,48 @@ export function DraftRabDialog({ eventId, item, trigger, open: controlledOpen, o
             </div>
             <div className="space-y-2">
               <Label htmlFor="item">Item Name</Label>
-              <Input id="item" name="item" defaultValue={item?.item} required />
+              <Input id="item" name="item" defaultValue={item?.item} key={item?.item} required />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="specification">Specification</Label>
-            <Textarea id="specification" name="specification" defaultValue={item?.specification} />
+            <Textarea id="specification" name="specification" defaultValue={item?.specification} key={item?.specification} />
           </div>
 
           <div className="grid grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="qty">Qty</Label>
-              <Input type="number" id="qty" name="qty" defaultValue={item?.qty || 1} min="0" required />
+              <Input type="number" id="qty" name="qty" defaultValue={item?.qty || 1} key={item?.qty} min="0" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="qtyType">Qty Type</Label>
-              <Input id="qtyType" name="qtyType" defaultValue={item?.qtyType || "Unit"} placeholder="Unit, Pcs, etc" />
+              <Input id="qtyType" name="qtyType" defaultValue={item?.qtyType || "Unit"} key={item?.qtyType} placeholder="Unit, Pcs, etc" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="frequency">Freq</Label>
-              <Input type="number" id="frequency" name="frequency" defaultValue={item?.frequency || 1} min="0" required />
+              <Input type="number" id="frequency" name="frequency" defaultValue={item?.frequency || 1} key={item?.frequency} min="0" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="frequencyType">Freq Type</Label>
-              <Input id="frequencyType" name="frequencyType" defaultValue={item?.frequencyType || "Day"} placeholder="Day, Event, etc" />
+              <Input id="frequencyType" name="frequencyType" defaultValue={item?.frequencyType || "Day"} key={item?.frequencyType} placeholder="Day, Event, etc" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="unitPriceRab">Price per Unit (RAB)</Label>
-              <Input type="number" id="unitPriceRab" name="unitPriceRab" defaultValue={item?.unitPriceRab} min="0" required />
+              <Input type="number" id="unitPriceRab" name="unitPriceRab" defaultValue={item?.unitPriceRab} key={item?.unitPriceRab} min="0" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="unitPriceReal">Price per Unit (Real)</Label>
-              <Input type="number" id="unitPriceReal" name="unitPriceReal" defaultValue={item?.unitPriceReal} min="0" />
+              <Input type="number" id="unitPriceReal" name="unitPriceReal" defaultValue={item?.unitPriceReal} key={item?.unitPriceReal} min="0" />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="remarks">Remarks</Label>
-            <Textarea id="remarks" name="remarks" defaultValue={item?.remarks} />
+            <Textarea id="remarks" name="remarks" defaultValue={item?.remarks} key={item?.remarks} />
           </div>
 
           <div className="flex justify-end gap-2">
