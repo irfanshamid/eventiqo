@@ -1,19 +1,29 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { completeProfile } from "@/app/actions/profile";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useFormStatus } from "react-dom";
-import Image from "next/image";
+import { useState } from 'react';
+import { completeProfile } from '@/app/actions/profile';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useFormStatus } from 'react-dom';
+import Image from 'next/image';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full bg-[#1E88E5] hover:bg-[#1565C0]" disabled={pending}>
-      {pending ? "Saving..." : "Complete Profile"}
+    <Button
+      type="submit"
+      className="w-full bg-[#1E88E5] hover:bg-[#1565C0]"
+      disabled={pending}
+    >
+      {pending ? 'Saving...' : 'Complete Profile'}
     </Button>
   );
 }
@@ -22,11 +32,11 @@ export default function CompleteProfilePage() {
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(formData: FormData) {
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirmPassword") as string;
+    const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError('Passwords do not match');
       return;
     }
 
@@ -41,10 +51,10 @@ export default function CompleteProfilePage() {
       <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div className="flex flex-col items-center justify-center text-center">
           <div className="relative h-16 w-40 mb-4">
-            <Image 
-              src="/logo.png" 
-              alt="Eventiqo Logo" 
-              fill 
+            <Image
+              src="/logo.png"
+              alt="Eventiqo Logo"
+              fill
               className="object-contain"
               priority
             />
@@ -69,16 +79,21 @@ export default function CompleteProfilePage() {
               <Label htmlFor="name">Full Name</Label>
               <Input id="name" name="name" required placeholder="John Doe" />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="phoneNumber">Phone Number</Label>
-              <Input id="phoneNumber" name="phoneNumber" required placeholder="+62..." />
+              <Input
+                id="phoneNumber"
+                name="phoneNumber"
+                required
+                placeholder="+62..."
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="gender">Gender</Label>
               <Select name="gender" required>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
                 <SelectContent>

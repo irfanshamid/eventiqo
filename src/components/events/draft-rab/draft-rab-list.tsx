@@ -395,11 +395,14 @@ export function DraftRabList({
         </Table>
       </div>
 
+      <DraftRabDialog eventId={eventId} />
+
       <DraftRabDialog 
         eventId={eventId} 
         item={editingItem}
         open={!!editingItem}
         onOpenChange={(open) => !open && setEditingItem(null)}
+        trigger={<span className="hidden"></span>}
       />
 
       <ConfirmDialog
