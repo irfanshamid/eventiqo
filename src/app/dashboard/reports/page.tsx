@@ -16,6 +16,13 @@ export default async function ReportsPage() {
     where: { createdById: ownerId },
     include: {
       expenses: true,
+      draftRabItems: {
+        where: {
+          totalPriceReal: {
+            not: null,
+          },
+        },
+      },
     },
     orderBy: {
       date: 'asc',
@@ -38,8 +45,8 @@ export default async function ReportsPage() {
       monthlyData[month] = { revenue: 0, profit: 0 };
     }
 
-    const eventCost = event.expenses.reduce(
-      (sum, exp) => sum + exp.actualAmount,
+    const eventCost = event.draftRabItems.reduce(
+      (sum, item) => sum + (item.totalPriceReal || 0),
       0,
     );
     const eventProfit = event.totalBudget - eventCost;
@@ -48,11 +55,12 @@ export default async function ReportsPage() {
     monthlyData[month].profit += eventProfit;
 
     // Expense Breakdown
-    event.expenses.forEach((exp) => {
-      if (!expenseCategoryData[exp.category]) {
-        expenseCategoryData[exp.category] = 0;
+    event.draftRabItems.forEach((item) => {
+      const category = item.category || 'Other';
+      if (!expenseCategoryData[category]) {
+        expenseCategoryData[category] = 0;
       }
-      expenseCategoryData[exp.category] += exp.actualAmount;
+      expenseCategoryData[category] += item.totalPriceReal || 0;
     });
   });
 

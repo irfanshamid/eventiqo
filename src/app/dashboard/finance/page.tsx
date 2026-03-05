@@ -26,7 +26,13 @@ export default async function FinancePage() {
   const events = await prisma.event.findMany({
     where: { createdById: ownerId },
     include: {
-      expenses: true,
+      draftRabItems: {
+        where: {
+          totalPriceReal: {
+            not: null,
+          },
+        },
+      },
     },
     orderBy: {
       date: 'desc',
@@ -39,7 +45,11 @@ export default async function FinancePage() {
   );
   const totalCost = events.reduce((sum, event) => {
     return (
-      sum + event.expenses.reduce((expSum, exp) => expSum + exp.actualAmount, 0)
+      sum +
+      event.draftRabItems.reduce(
+        (expSum, item) => expSum + (item.totalPriceReal || 0),
+        0,
+      )
     );
   }, 0);
   const totalProfit = totalRevenue - totalCost;
@@ -47,7 +57,10 @@ export default async function FinancePage() {
     totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
 
   const chartData = events.map((event) => {
-    const cost = event.expenses.reduce((sum, exp) => sum + exp.actualAmount, 0);
+    const cost = event.draftRabItems.reduce(
+      (sum, item) => sum + (item.totalPriceReal || 0),
+      0,
+    );
     const profit = event.totalBudget - cost;
     return {
       name: event.name,
@@ -153,8 +166,8 @@ export default async function FinancePage() {
           </TableHeader>
           <TableBody>
             {events.map((event) => {
-              const eventCost = event.expenses.reduce(
-                (sum, exp) => sum + exp.actualAmount,
+              const eventCost = event.draftRabItems.reduce(
+                (sum, item) => sum + (item.totalPriceReal || 0),
                 0,
               );
               const eventProfit = event.totalBudget - eventCost;

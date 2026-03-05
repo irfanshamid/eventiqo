@@ -46,10 +46,13 @@ export default async function DashboardPage() {
     },
   });
 
-  const expenses = await prisma.expense.findMany({
+  const draftRabItems = await prisma.draftRabItem.findMany({
     where: {
       event: {
         createdById: ownerId,
+      },
+      totalPriceReal: {
+        not: null,
       },
     },
   });
@@ -67,7 +70,10 @@ export default async function DashboardPage() {
   ];
 
   const totalBudget = events.reduce((acc, e) => acc + e.totalBudget, 0);
-  const totalSpent = expenses.reduce((acc, e) => acc + e.actualAmount, 0);
+  const totalSpent = draftRabItems.reduce(
+    (acc, item) => acc + (item.totalPriceReal || 0),
+    0,
+  );
   const totalProfit = totalBudget - totalSpent;
 
   return (
