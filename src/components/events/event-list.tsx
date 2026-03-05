@@ -120,7 +120,7 @@ export function EventList({ events }: { events: Event[] }) {
               <TableHead>Location</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Budget</TableHead>
-              <TableHead>Status</TableHead>
+              {/* <TableHead>Status</TableHead> */}
               <TableHead className="text-right pr-6">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -154,7 +154,7 @@ export function EventList({ events }: { events: Event[] }) {
                       maximumFractionDigits: 0,
                     }).format(event.totalBudget)}
                   </TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     <Badge
                       variant={
                         event.status === 'COMPLETED' ? 'default' : 'secondary'
@@ -162,7 +162,7 @@ export function EventList({ events }: { events: Event[] }) {
                     >
                       {event.status}
                     </Badge>
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell className="text-right pr-6">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

@@ -159,7 +159,7 @@ export function EventDialog({
                 defaultValue={event?.targetMargin || 20}
               />
             </div>
-            <div className="flex flex-col gap-2">
+            {/* <div className="flex flex-col gap-2">
               <Label htmlFor="status">Status</Label>
               <div>
                 <Select name="status" defaultValue={event?.status || 'DRAFT'}>
@@ -173,7 +173,8 @@ export function EventDialog({
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+            </div> */}
+            <input type="hidden" name="status" value={event?.status || 'DRAFT'} />
           </div>
           <DialogFooter>
             <Button type="submit" loading={isLoading}>
