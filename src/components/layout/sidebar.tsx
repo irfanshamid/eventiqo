@@ -68,12 +68,18 @@ const sidebarItems = [
     href: '/dashboard/settings',
     icon: Settings,
   },
+  {
+    title: 'Tutorial',
+    href: '/dashboard/tutorial',
+    icon: BookOpen,
+  },
 ];
 
 const staffAllowedRoutes = [
   '/dashboard/tasks',
   '/dashboard/team',
   '/dashboard/settings',
+  '/dashboard/tutorial',
 ];
 
 export function Sidebar({ userRole }: { userRole?: string }) {
