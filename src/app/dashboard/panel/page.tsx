@@ -38,7 +38,9 @@ export default async function DashboardPage() {
     },
   });
 
-  const vendors = await prisma.vendor.findMany();
+  const vendors = await prisma.vendor.findMany({
+    where: { createdById: ownerId },
+  });
 
   const teamMembers = await prisma.user.findMany({
     where: {
