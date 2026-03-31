@@ -91,6 +91,228 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Why Eventiqo is Different & Pricing Section */}
+        <section className="py-20 px-6 bg-white">
+          <div className="max-w-4xl mx-auto space-y-16">
+            {/* Kenapa Eventiqo Berbeda? */}
+            <div className="text-center space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+                Kenapa Eventiqo Berbeda?
+              </h2>
+              <p className="text-xl text-gray-600">
+                Karena ini{' '}
+                <span className="font-semibold text-gray-900">
+                  bukan sekadar
+                </span>{' '}
+                event manager. Ini sistem untuk:
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto mt-8">
+                {[
+                  'Menghasilkan RAB profesional otomatis',
+                  'Mengontrol margin',
+                  'Menjaga cashflow',
+                  'Mempercepat closing',
+                  'Menjalankan EO seperti perusahaan',
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 bg-blue-50 p-4 rounded-xl border border-blue-100"
+                  >
+                    <CheckCircle className="h-6 w-6 text-[#1E88E5] shrink-0" />
+                    <span className="font-medium text-gray-800">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Harga Normalnya Berapa? */}
+            <div className="bg-gray-50 rounded-3xl p-8 md:p-12 border border-gray-100 shadow-sm">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-2">
+                  <span className="text-3xl">💰</span> Harga Normalnya Berapa?
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Kalau kamu membangun sistem seperti ini secara terpisah:
+                </p>
+              </div>
+              <div className="space-y-4 max-w-2xl mx-auto">
+                {[
+                  {
+                    name: 'Software manajemen project',
+                    price: 'Rp 300.000 / bulan',
+                  },
+                  { name: 'Template RAB profesional', price: 'Rp 500.000+' },
+                  {
+                    name: 'Template kontrak & legal drafting',
+                    price: 'Rp 1.000.000+',
+                  },
+                  { name: 'Sistem budgeting & finance', price: 'Rp 500.000+' },
+                  {
+                    name: 'SOP & template library lengkap',
+                    price: 'Rp 1.000.000+',
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex justify-between items-center border-b border-gray-200 pb-4 last:border-0 last:pb-0"
+                  >
+                    <span className="text-gray-700">{item.name}</span>
+                    <span className="font-semibold text-gray-900">
+                      {item.price}
+                    </span>
+                  </div>
+                ))}
+                <div className="mt-6 p-4 bg-red-50 rounded-xl text-center border border-red-100">
+                  <p className="text-red-800 font-medium">
+                    Total nilai sistem ini bisa mencapai{' '}
+                    <span className="font-bold">jutaan rupiah</span>.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 🔥 Sekarang Kamu Bisa Akses Semuanya */}
+            <div className="text-center space-y-6 bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-3xl p-8 md:p-12 shadow-xl">
+              <h3 className="text-2xl md:text-3xl font-bold flex items-center justify-center gap-2">
+                <span className="text-3xl">🔥</span> Sekarang Kamu Bisa Akses
+                Semuanya Hanya
+              </h3>
+              <div className="text-5xl md:text-7xl font-extrabold text-orange-400 drop-shadow-sm">
+                Rp 149.000
+              </div>
+              <div className="flex flex-wrap justify-center gap-4 text-blue-100 font-medium text-lg pt-4">
+                <span className="flex items-center gap-1">
+                  <CheckCircle className="h-5 w-5" /> Untuk semua fitur
+                </span>
+                <span className="flex items-center gap-1">
+                  <CheckCircle className="h-5 w-5" /> Semua akses
+                </span>
+                <span className="flex items-center gap-1">
+                  <CheckCircle className="h-5 w-5" /> Semua modul
+                </span>
+                <span className="flex items-center gap-1">
+                  <CheckCircle className="h-5 w-5" /> Tanpa upgrade tersembunyi
+                </span>
+              </div>
+            </div>
+
+            {/* 💬 Apa Kata Pengguna? */}
+            <div className="space-y-8">
+              <div className="text-center">
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
+                  <span className="text-3xl">💬</span> Apa Kata Pengguna?
+                </h3>
+              </div>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  {
+                    quote:
+                      'Dulu saya selalu bingung hitung margin. Setelah pakai Eventiqo, saya bisa lihat profit tiap event sebelum closing.',
+                    author: 'Rina',
+                    role: 'Wedding Organizer',
+                  },
+                  {
+                    quote:
+                      'Proposal dan kontrak jadi jauh lebih cepat. Klien juga bilang kelihatan lebih profesional.',
+                    author: 'Adi',
+                    role: 'Corporate EO',
+                  },
+                  {
+                    quote:
+                      'Yang paling membantu itu RAB Generator dan budgeting-nya. Sekarang saya nggak takut lagi margin bocor.',
+                    author: 'Maya',
+                    role: 'Agency Event',
+                  },
+                ].map((testimonial, i) => (
+                  <div
+                    key={i}
+                    className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative"
+                  >
+                    <div className="text-4xl text-blue-200 absolute top-4 left-4 font-serif">
+                      &quot;
+                    </div>
+                    <p className="text-gray-700 italic relative z-10 pt-4 mb-4">
+                      &quot;{testimonial.quote}&quot;
+                    </p>
+                    <div className="border-t border-gray-50 pt-4">
+                      <p className="font-bold text-gray-900">
+                        {testimonial.author}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {testimonial.role}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ⏳ Kenapa Harus Sekarang? */}
+            <div className="bg-orange-50 rounded-3xl p-8 md:p-12 border border-orange-100 text-center space-y-6">
+              <h3 className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-2">
+                <span className="text-3xl">⏳</span> Kenapa Harus Sekarang?
+              </h3>
+              <div className="max-w-2xl mx-auto space-y-4 text-lg text-gray-700">
+                <p>
+                  Harga <span className="font-bold">Rp 149.000</span> ini adalah{' '}
+                  <span className="font-bold text-orange-600">
+                    harga launching
+                  </span>
+                  .
+                </p>
+                <p>Harga akan naik bertahap setelah periode awal selesai.</p>
+                <div className="inline-block bg-orange-200 text-orange-900 px-6 py-2 rounded-full font-bold">
+                  Slot promo terbatas untuk 100 pengguna pertama.
+                </div>
+                <p>Setelah itu, harga akan kembali ke harga normal.</p>
+              </div>
+            </div>
+
+            {/* 🚨 Jangan Tunggu Sampai Margin Bocor Lagi */}
+            <div className="text-center space-y-8 pb-8">
+              <div className="space-y-4">
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
+                  <span className="text-3xl">🚨</span> Jangan Tunggu Sampai
+                  Margin Bocor Lagi
+                </h3>
+                <div className="text-xl text-gray-600 font-medium flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-6">
+                  <span className="flex items-center gap-2">
+                    <span className="text-red-500">✖</span> Berhenti kerja
+                    manual
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-red-500">✖</span> Berhenti
+                    tebak-tebakan profit
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-red-500">✖</span> Berhenti terlihat
+                    tidak profesional
+                  </span>
+                </div>
+                <p className="text-2xl font-bold text-[#1E88E5] pt-4">
+                  Gunakan sistem yang membuat EO kamu naik kelas.
+                </p>
+              </div>
+
+              {/* 🚀 Mulai Sekarang */}
+              <div className="pt-8">
+                <Button
+                  size="lg"
+                  className="bg-orange-500 hover:bg-orange-600 text-black px-10 h-16 text-xl w-full sm:w-auto shadow-2xl hover:shadow-orange-500/50 transition-all border-none font-bold rounded-full animate-pulse"
+                  asChild
+                >
+                  <Link
+                    href="https://mudakayarayaid.myr.id/pl/eventiqo"
+                    target="_blank"
+                  >
+                    🚀 Daftar Sekarang – Rp 149.000
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Problem Section */}
         <section className="py-20 px-6 bg-white">
           <div className="max-w-4xl mx-auto text-center mb-16">
